@@ -67,7 +67,7 @@ new Vue({
     then(airports => {
 
       // Let's only focus on the top 100
-      airports = airports.slice(0, 100);
+      airports = airports.slice(0, 500);
       var i = airports.length,d,proj;
 
       while (i--) {
