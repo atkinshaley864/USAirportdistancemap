@@ -66,8 +66,8 @@ new Vue({
     then(response => response.json()).
     then(airports => {
 
-      // Let's only focus on the top 100
-      airports = airports.slice(0, 500);
+      // Let's only focus on the top 5000
+      airports = airports.slice(0, 5000);
       var i = airports.length,d,proj;
 
       while (i--) {
