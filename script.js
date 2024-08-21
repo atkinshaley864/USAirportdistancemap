@@ -10,32 +10,32 @@ new Vue({
     currentAirport: null,
     lastAirport: null,
     markers: [
-      {
-        airport: null,
-        x: 200,
-        y: 300,
-        startX: 0,
-        startY: 0,
-        fill: '#f47825',
-        current: false
-      },
-      {
-        airport: null,
-        x: 500,
-        y: 100,
-        startX: 0,
-        startY: 0,
-        fill: '#00b26b',
-        current: false
-      }
-    ]
-  }),
+    {
+      airport: null,
+      x: 200,
+      y: 300,
+      startX: 0,
+      startY: 0,
+      fill: '#f47825',
+      current: false },
+
+    {
+      airport: null,
+      x: 500,
+      y: 100,
+      startX: 0,
+      startY: 0,
+      fill: '#00b26b',
+      current: false }] }),
+
+
+
 
   filters: {
     numberWithCommas(val) {
       return val && val.toString ? val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : val;
-    }
-  },
+    } },
+
 
   mounted() {
 
@@ -44,57 +44,58 @@ new Vue({
     this.projection = projection;
 
     // D3 US States map
-    fetch('https://s3-us-west-2.amazonaws.com/s.cdpn.io/39255/us-states.json')
-      .then(response => response.json())
-      .then(states => {
+    fetch('https://s3-us-west-2.amazonaws.com/s.cdpn.io/39255/us-states.json').
+    then(response => response.json()).
+    then(states => {
 
-        // Define path generator
-        var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
-          .projection(projection); // tell path generator to use albersUsa projection
+      // Define path generator
+      var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+      .projection(projection); // tell path generator to use albersUsa projection
 
-        // Bind the data to the SVG and create one path per GeoJSON feature
-        d3.select(this.$refs.states)
-          .selectAll("path")
-          .data(states.features)
-          .enter()
-          .append("path")
-          .attr("d", path);
-      });
+      // Bind the data to the SVG and create one path per GeoJSON feature
+      d3.select(this.$refs.states).
+      selectAll("path").
+      data(states.features).
+      enter().
+      append("path").
+      attr("d", path);
+    });
 
     // Airports
-    fetch('https://s3-us-west-2.amazonaws.com/s.cdpn.io/39255/airports.json')
-      .then(response => response.json())
-      .then(airports => {
-        // No slicing or filtering, so all airports are included
+    fetch('https://s3-us-west-2.amazonaws.com/s.cdpn.io/39255/airports.json').
+    then(response => response.json()).
+    then(airports => {
 
-        var i = airports.length, d, proj;
+      // Let's only focus on the top 100
+      airports = airports.slice(0, 100);
+      var i = airports.length,d,proj;
 
-        while (i--) {
-          d = airports[i];
-          proj = this.projection([d.Lng, d.Lat]);
+      while (i--) {
+        d = airports[i];
+        proj = projection([d.Lng, d.Lat]);
 
-          if (proj) {
-            d.x = proj[0];
-            d.y = proj[1];
-          } else {
-            airports.splice(i, 1);  // Remove airports that can't be projected
-          }
+        if (proj) {
+          d.x = proj[0];
+          d.y = proj[1];
+        } else {
+          airports.splice(i, 1);
         }
+      }
 
-        this.airports = airports.reverse();
+      this.airports = airports.reverse();
 
-        var la = null;
+      var la = null;
 
-        this.markers.forEach(marker => {
-          var ra = this.randomAirport();
-          if (ra == la) { ra = this.randomAirport(); }
-          la = ra;
-          marker.airport = ra;
-          marker.x = ra.x;
-          marker.y = ra.y;
-        });
-        this.markerDistance();
+      this.markers.forEach(marker => {
+        var ra = this.randomAirport();
+        if (ra == la) {ra = this.randomAirport();}
+        la = ra;
+        marker.airport = ra;
+        marker.x = ra.x;
+        marker.y = ra.y;
       });
+      this.markerDistance();
+    });
 
 
   },
@@ -106,7 +107,7 @@ new Vue({
     },
 
     markerSet(e, marker) {
-      if (e) { e.preventDefault(); }
+      if (e) {e.preventDefault();}
 
       marker = marker || this.markers[0];
       marker.airport = null;
@@ -126,9 +127,9 @@ new Vue({
           opacity: 0,
           ease: "Linear.easeNone",
           onComplete: function () {
-            if (oldTween) { oldTween.kill(); }
-          }
-        });
+            if (oldTween) {oldTween.kill();}
+          } });
+
 
         this.airplaneFade = tl;
       }
@@ -175,7 +176,7 @@ new Vue({
 
     markerConnect() {
       var m1 = this.markers[1],
-        m2 = this.markers[0];
+      m2 = this.markers[0];
 
       if (m1.x < m2.x) {
         m1 = this.markers[0];
@@ -183,8 +184,8 @@ new Vue({
       }
 
       var dx = m2.x - m1.x,
-        dy = m2.y - m1.y,
-        dr = Math.sqrt(dx * dx + dy * dy);
+      dy = m2.y - m1.y,
+      dr = Math.sqrt(dx * dx + dy * dy);
 
       return "M" + m2.x + "," + m2.y + "A" + dr + "," + dr + " 0 0,1 " + m1.x + "," + m1.y;
     },
@@ -198,8 +199,8 @@ new Vue({
       dist = Math.acos(dist);
       dist = dist * 180 / Math.PI;
       dist = dist * 60 * 1.1515;
-      if (unit == "K") { dist = dist * 1.609344; }
-      if (unit == "N") { dist = dist * 0.8684; }
+      if (unit == "K") {dist = dist * 1.609344;}
+      if (unit == "N") {dist = dist * 0.8684;}
       return dist;
 
     },
@@ -219,16 +220,16 @@ new Vue({
       if (airport !== this.currentAirport) {
         airport.current = true;
         this.currentAirport = airport;
-        if (this.currentMarker) { this.currentMarker.airport = airport; }
+        if (this.currentMarker) {this.currentMarker.airport = airport;}
       }
     },
 
     airportClick(e, airport) {
-      if (!this.currentMarker) { this.markerSet(e); }
+      if (!this.currentMarker) {this.markerSet(e);}
       this.currentAirport = airport;
       this.currentMarker.x = this.currentAirport.x;
       this.currentMarker.y = this.currentAirport.y;
-      if (this.currentMarker) { this.currentMarker.airport = airport; }
+      if (this.currentMarker) {this.currentMarker.airport = airport;}
     },
 
     airportLeave(e, airport) {
@@ -260,26 +261,24 @@ new Vue({
           values: bez,
           curviness: 1,
           autoRotate: -90,
-          type: "cubic"
-        },
+          type: "cubic" },
+
         reversed: true,
-        ease: Linear.easeNone
-      }, 0);
+        ease: Linear.easeNone },
+      0);
 
       newTween.fromTo(this.$refs.airplane, opacityDuration, {
-        opacity: 0
-      }, {
+        opacity: 0 },
+      {
         opacity: 1,
         delay: opacityDuration / 2,
-        ease: "Linear.easeNone"
-      }, 0);
+        ease: "Linear.easeNone" },
+      0);
 
       newTween.to(this.$refs.airplane, opacityDuration, {
         opacity: 0,
-        ease: 'Linear.easeNone'
-      }, '-=' + opacityDuration);
+        ease: 'Linear.easeNone' },
+      '-=' + opacityDuration);
 
       this.airplaneTween = newTween;
-    }
-  }
-});
+    } } });
