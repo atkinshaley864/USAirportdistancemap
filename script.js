@@ -40,7 +40,7 @@ new Vue({
   mounted() {
 
     // D3 Projection
-    var projection = d3.geoAlbersUsa().scale([1200]); // Adjust the scale if needed
+    var projection = d3.geoAlbersUsa().scale([1500]); // scale things down so see entire US
     this.projection = projection;
 
     // D3 US States map
@@ -65,15 +65,13 @@ new Vue({
     fetch('https://s3-us-west-2.amazonaws.com/s.cdpn.io/39255/airports.json')
       .then(response => response.json())
       .then(airports => {
-        // Process all airports in the dataset
+        // No slicing or filtering, so all airports are included
 
         var i = airports.length, d, proj;
 
         while (i--) {
           d = airports[i];
           proj = this.projection([d.Lng, d.Lat]);
-
-          console.log(proj); // Debugging: Check if the projection works correctly
 
           if (proj) {
             d.x = proj[0];
